@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Status{
+  PENDING
+  STARTED
+  PROCESS
+  COMPLETED
+  CANCELED
+}
+model Estado {
+  id          Int         @id @default(autoincrement())
+  nombre      String      @db.VarChar(50)
+  capital     String?     @db.VarChar(128)
+  area        Float
+  municipios  Municipio[]
+}
+
+model Municipio {
+  id          Int         @id @default(autoincrement())
+  nombre      String      @db.VarChar(128)
+  poblacion   Int
+  superficie  Float
+  estadoId    Int
+  estado      Estado      @relation(fields: [estadoId], references: [id])
+  localidades Localidad[]
+  direcciones Direccion[]
+}
+
+model Localidad {
+  id          Int         @id @default(autoincrement())
+  nombre      String      @db.VarChar(128)
+  poblacion   Int
+  cp          String      @db.VarChar(5)
+  municipioId Int
+  municipio   Municipio   @relation(fields: [municipioId], references: [id])
+  clientes    Cliente[]
+  direcciones Direccion[]
+}
+
+model Direccion {
+  id          Int         @id @default(autoincrement())
+  municipioId Int
+  localidadId Int
+  calle       String      @db.VarChar(70)
+  numeroExt   String      @db.VarChar(4)
+  numeroInt   String?     @db.VarChar(4)
+  municipio   Municipio   @relation(fields: [municipioId], references: [id])
+  localidad   Localidad   @relation(fields: [localidadId], references: [id])
+  clientes    Cliente[]
+}
+
+model Cliente {
+  id          Int         @id @default(autoincrement())
+  nombre      String      @db.VarChar(128)
+  apellidos   String      @db.VarChar(128)
+  rfc         String      @db.VarChar(10)
+  email       String      @db.VarChar(13)
+  telefono    String      @db.VarChar(10)
+  estatus     String      @default("activo")
+  localidadId Int
+  direccionId Int
+  localidad   Localidad   @relation(fields: [localidadId], references: [id])
+  direccion   Direccion   @relation(fields: [direccionId], references: [id])
+}
+
+
