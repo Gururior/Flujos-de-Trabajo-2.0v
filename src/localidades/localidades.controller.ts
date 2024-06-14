@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { LocalidadesService } from './localidades.service';
-import { CreateLocalidadeDto } from './dto/create-localidade.dto';
+import { CreateLocalidadDto } from './dto/create-localidade.dto';
 import { UpdateLocalidadeDto } from './dto/update-localidade.dto';
 
 @Controller('localidades')
@@ -8,8 +8,8 @@ export class LocalidadesController {
   constructor(private readonly localidadesService: LocalidadesService) {}
 
   @Post()
-  create(@Body() createLocalidadeDto: CreateLocalidadeDto) {
-    return this.localidadesService.create(createLocalidadeDto);
+  create(@Body() createLocalidadDto: CreateLocalidadDto) {
+    return this.localidadesService.create(createLocalidadDto as any);
   }
 
   @Get()
@@ -18,17 +18,17 @@ export class LocalidadesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.localidadesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.localidadesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLocalidadeDto: UpdateLocalidadeDto) {
-    return this.localidadesService.update(+id, updateLocalidadeDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() UpdateLocalidadeDto: UpdateLocalidadeDto) {
+    return this.localidadesService.update(id, UpdateLocalidadeDto as any);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.localidadesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.localidadesService.remove(id);
   }
 }
