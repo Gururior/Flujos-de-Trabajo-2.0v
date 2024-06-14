@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { CreateEstadoDto } from './dto/create-estado.dto';
 import { UpdateEstadoDto } from './dto/update-estado.dto';
+import { PrismaService } from 'src/estados/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class EstadosService {
-  create(createEstadoDto: CreateEstadoDto) {
-    return 'This action adds a new estado';
+  
+  constructor(private database: PrismaService){}
+  async create(estadoData: Prisma.EstadoCreateInput) {
+    return this.database.estado.create({
+      data: estadoData
+    })
   }
-
+  
   findAll() {
-    return `This action returns all estados`;
+    return this.database.estado.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} estado`;
+  async findOne(id: number) {
+    const estado = await this.database.estado.findUnique({
+      where: {
+        id
+      }
+    });
+
+    if(!estado){
+      throw new NotFoundException('No se han encontrado ningun registro')
+    }
+
+    return estado;
   }
 
-  update(id: number, updateEstadoDto: UpdateEstadoDto) {
-    return `This action updates a #${id} estado`;
+   async update(id: number, updateEstadoDto: UpdateEstadoDto) {
+    return this.database.estado.update({
+      data: { ...updateEstadoDto} as any,
+      where: {
+        id
+      }
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} estado`;
+  async remove(id: number) {
+    return this.database.estado.delete({
+      where: {
+        id,
+      }
+    });
   }
 }

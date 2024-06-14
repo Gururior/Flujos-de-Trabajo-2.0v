@@ -1,26 +1,48 @@
-import { Injectable } from '@nestjs/common';
-import { CreateDireccioneDto } from './dto/create-direccione.dto';
-import { UpdateDireccioneDto } from './dto/update-direccione.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/direcciones/prisma.service';
+import { Prisma, Direccion } from '@prisma/client';
 
 @Injectable()
 export class DireccionesService {
-  create(createDireccioneDto: CreateDireccioneDto) {
-    return 'This action adds a new direccione';
+  constructor(private database: PrismaService) {}
+
+  async create(direccionData: Prisma.DireccionCreateInput): Promise<Direccion> {
+    return this.database.direccion.create({
+      data: direccionData,
+      include: { clientes: true, localidad: true }
+    });
   }
 
-  findAll() {
-    return `This action returns all direcciones`;
+  findAll(): Promise<Direccion[]> {
+    return this.database.direccion.findMany({
+      include: { clientes: true, localidad: true }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} direccione`;
+  async findOne(id: number): Promise<Direccion> {
+    return this.database.direccion.findUnique({
+      where: { id },
+      include: { clientes: true, localidad: true }
+    }).then(direccion => {
+      if (!direccion) {
+        throw new NotFoundException('No se ha encontrado ningún registro');
+      }
+      return direccion;
+    });
   }
 
-  update(id: number, updateDireccioneDto: UpdateDireccioneDto) {
-    return `This action updates a #${id} direccione`;
+  async update(id: number, updateDireccionDto: Prisma.DireccionUpdateInput): Promise<Direccion> {
+    return this.database.direccion.update({
+      data: updateDireccionDto,
+      where: { id },
+      include: { clientes: true, localidad: true }
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} direccione`;
+  async remove(id: number): Promise<Direccion> {
+    return this.database.direccion.delete({
+      where: { id },
+      include: { clientes: true, localidad: true }
+    });
   }
 }

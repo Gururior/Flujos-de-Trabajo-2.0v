@@ -1,26 +1,48 @@
-import { Injectable } from '@nestjs/common';
-import { CreateMunicipioDto } from './dto/create-municipio.dto';
-import { UpdateMunicipioDto } from './dto/update-municipio.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/municipios/prisma.service';
+import { Municipio, Prisma } from '@prisma/client';
 
 @Injectable()
 export class MunicipiosService {
-  create(createMunicipioDto: CreateMunicipioDto) {
-    return 'This action adds a new municipio';
+  constructor(private database: PrismaService) {}
+
+  async create(municipioData: Prisma.MunicipioCreateInput): Promise<Municipio> {
+    return this.database.municipio.create({
+      data: municipioData,
+      include: { localidades: true }
+    });
   }
 
-  findAll() {
-    return `This action returns all municipios`;
+  findAll(): Promise<Municipio[]> {
+    return this.database.municipio.findMany({
+      include: { localidades: true }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} municipio`;
+  async findOne(id: number): Promise<Municipio> {
+    return this.database.municipio.findUnique({
+      where: { id },
+      include: { localidades: true }
+    }).then(municipio => {
+      if (!municipio) {
+        throw new NotFoundException('No se ha encontrado ningún registro');
+      }
+      return municipio;
+    });
   }
 
-  update(id: number, updateMunicipioDto: UpdateMunicipioDto) {
-    return `This action updates a #${id} municipio`;
+  async update(id: number, updateMunicipioDto: Prisma.MunicipioUpdateInput): Promise<Municipio> {
+    return this.database.municipio.update({
+      data: updateMunicipioDto,
+      where: { id },
+      include: { localidades: true }
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} municipio`;
+  async remove(id: number): Promise<Municipio> {
+    return this.database.municipio.delete({
+      where: { id },
+      include: { localidades: true }
+    });
   }
 }
