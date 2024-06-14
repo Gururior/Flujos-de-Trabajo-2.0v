@@ -1,34 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { DireccionesService } from './direcciones.service';
-import { CreateDireccioneDto } from './dto/create-direccione.dto';
+import { CreateDireccionDto } from './dto/create-direccione.dto';
 import { UpdateDireccioneDto } from './dto/update-direccione.dto';
 
 @Controller('direcciones')
 export class DireccionesController {
-  constructor(private readonly direccionesService: DireccionesService) {}
+  constructor(private readonly DireccionesService: DireccionesService) {}
 
   @Post()
-  create(@Body() createDireccioneDto: CreateDireccioneDto) {
-    return this.direccionesService.create(createDireccioneDto);
+  create(@Body() createClienteDto: CreateDireccionDto) {
+    return this.DireccionesService.create(createClienteDto as any);
   }
 
   @Get()
   findAll() {
-    return this.direccionesService.findAll();
+    return this.DireccionesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.direccionesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.DireccionesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDireccioneDto: UpdateDireccioneDto) {
-    return this.direccionesService.update(+id, updateDireccioneDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() UpdateDireccioneDto: UpdateDireccioneDto) {
+    return this.DireccionesService.update(id, UpdateDireccioneDto as any);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.direccionesService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.DireccionesService.remove(id);
   }
 }

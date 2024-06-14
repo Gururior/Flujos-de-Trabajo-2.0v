@@ -1,4 +1,10 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateDireccioneDto } from './create-direccione.dto';
+import { CreateDireccionDto } from './create-direccione.dto';
 
-export class UpdateDireccioneDto extends PartialType(CreateDireccioneDto) {}
+export class UpdateDireccioneDto extends PartialType(CreateDireccionDto) {
+    municipioId?: number;
+    localidadId?: number;
+    calle?: string;
+    numeroExt?: string;
+    numeroInt?: string;
+}
